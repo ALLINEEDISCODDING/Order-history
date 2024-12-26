@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Param,
   Post,
   Put,
   Query,
@@ -18,6 +19,13 @@ const ORIGIONAL_RESOURCE_MOCK = {
 };
 const AFTER_MOCK = "['after array item']";
 const BEFORE_MOCK = "['before array item']";
+const HISTORY_ITEM_MOCK = new HistoryItems({
+  id: 'some-item-id',
+  originalResource: ORIGIONAL_RESOURCE_MOCK,
+  after: AFTER_MOCK,
+  before: BEFORE_MOCK,
+  comment: 'Какой-нибудь комментарий',
+});
 @Controller('history-item')
 export class HistoryItemController {
   constructor(private readonly historyItemService: HistoryItemService) {}
@@ -26,12 +34,7 @@ export class HistoryItemController {
   @ApiResponse({
     status: 200,
     description: 'Успех',
-    example: new HistoryItems({
-      id: 'some-item',
-      originalResource: ORIGIONAL_RESOURCE_MOCK,
-      after: AFTER_MOCK,
-      before: BEFORE_MOCK,
-    }),
+    example: HISTORY_ITEM_MOCK,
   })
   @ApiResponse({
     status: 404,
@@ -49,12 +52,7 @@ export class HistoryItemController {
   @ApiResponse({
     status: 201,
     description: 'Успех',
-    example: new HistoryItems({
-      id: 'some-item',
-      originalResource: ORIGIONAL_RESOURCE_MOCK,
-      after: AFTER_MOCK,
-      before: BEFORE_MOCK,
-    }),
+    example: HISTORY_ITEM_MOCK,
   })
   createHistoryItem(@Body() historyItem: CreateHistoryItemDto): HistoryItems {
     return this.historyItemService.addHistoryItem(historyItem);
@@ -63,17 +61,25 @@ export class HistoryItemController {
   @Get()
   @ApiResponse({
     status: 200,
-    description: 'Успешное получение истории',
-    example: [
-      new HistoryItems({
-        id: 'some-id',
-        originalResource: ORIGIONAL_RESOURCE_MOCK,
-        after: AFTER_MOCK,
-        before: BEFORE_MOCK,
-      }),
-    ],
+    description: 'Успешное получение историй',
+    example: [HISTORY_ITEM_MOCK],
   })
   getHistoryItems(): HistoryItems[] {
     return this.historyItemService.getHistoryItems();
+  }
+
+  @Get(':history_item_id')
+  @ApiResponse({
+    status: 200,
+    description: 'Успешное получение истории',
+    example: HISTORY_ITEM_MOCK,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Не найдено',
+    example: new HttpException('Объект не найден', HttpStatus.NOT_FOUND),
+  })
+  getById(@Param('history_item_id') history_item_id: string) {
+    return this.historyItemService.getById(history_item_id);
   }
 }

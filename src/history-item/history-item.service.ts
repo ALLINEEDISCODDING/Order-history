@@ -5,6 +5,19 @@ import { CreateHistoryItemDto, HistoryItems } from './history-item.types';
 export class HistoryItemService {
   private historyItems: HistoryItems[] = [];
 
+  public getHistoryItems = (): HistoryItems[] => {
+    return this.historyItems;
+  };
+
+  public getById = (id: string): HistoryItems => {
+    const finded = this.historyItems.find((item) => item.id === id);
+
+    if (!finded)
+      throw new HttpException('Объект не найден', HttpStatus.NOT_FOUND);
+
+    return finded;
+  };
+
   public editHistoryItem = (id: string, historyItem: CreateHistoryItemDto) => {
     let findHistoryItem = this.historyItems.find((item) => item.id === id);
 
@@ -32,16 +45,12 @@ export class HistoryItemService {
   public addHistoryItem = (historyItem: CreateHistoryItemDto) => {
     const historyItemModified: HistoryItems = {
       ...historyItem,
-      id: Date.now().toString(),
+      id: `history_item-${Date.now().toString()}`,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
     this.historyItems.push(historyItemModified);
 
     return historyItemModified;
-  };
-
-  public getHistoryItems = (): HistoryItems[] => {
-    return this.historyItems;
   };
 }

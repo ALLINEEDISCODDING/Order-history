@@ -13,10 +13,11 @@ class OriginalResourceDto {
 }
 
 export class CreateHistoryItemDto {
-  constructor({ originalResource, after, before }) {
+  constructor({ originalResource, after, before, comment }) {
     this.originalResource = originalResource;
     this.after = after;
     this.before = before;
+    this.comment = comment;
   }
   @ApiProperty({
     description: 'Оригинальный ресурс с которого пришло изменение',
@@ -32,11 +33,17 @@ export class CreateHistoryItemDto {
     description: 'Объект до изменения (формат JSON)',
   })
   before: string;
+
+  @ApiProperty({
+    description: 'Комментарий к истории',
+    required: false,
+  })
+  comment: string;
 }
 
 export class HistoryItems extends CreateHistoryItemDto {
-  constructor({ id, after, before, originalResource }) {
-    super({ after, before, originalResource });
+  constructor({ id, after, before, originalResource, comment }) {
+    super({ after, before, originalResource, comment });
 
     this.id = id;
     this.createdAt = new Date().toISOString();
