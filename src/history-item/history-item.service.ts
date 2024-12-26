@@ -1,17 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { IHistoryItems, THistoryItemShort } from './history-item.types';
+import { CreateHistoryItemDto, HistoryItems } from './history-item.types';
 
 @Injectable()
 export class HistoryItemService {
-  private historyItems: IHistoryItems[] = [];
+  private historyItems: HistoryItems[] = [];
 
-  public editHistoryItem = (id: string, historyItem: THistoryItemShort) => {
+  public editHistoryItem = (id: string, historyItem: CreateHistoryItemDto) => {
     let findHistoryItem = this.historyItems.find((item) => item.id === id);
 
     if (!findHistoryItem)
       throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
 
-    let historyItemModified: Partial<IHistoryItems> = {};
+    let historyItemModified: Partial<HistoryItems> = {};
 
     this.historyItems = this.historyItems.map((item) => {
       if (item.id === id) {
@@ -20,17 +20,17 @@ export class HistoryItemService {
           ...historyItem,
           updatedAt: new Date().toISOString(),
         };
-        return historyItemModified as IHistoryItems;
+        return historyItemModified as HistoryItems;
       }
 
       return { ...item };
     });
 
-    return historyItemModified as IHistoryItems;
+    return historyItemModified as HistoryItems;
   };
 
-  public addHistoryItem = (historyItem: THistoryItemShort) => {
-    const historyItemModified: IHistoryItems = {
+  public addHistoryItem = (historyItem: CreateHistoryItemDto) => {
+    const historyItemModified: HistoryItems = {
       ...historyItem,
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
@@ -41,7 +41,7 @@ export class HistoryItemService {
     return historyItemModified;
   };
 
-  public getHistoryItems = (): IHistoryItems[] => {
+  public getHistoryItems = (): HistoryItems[] => {
     return this.historyItems;
   };
 }
