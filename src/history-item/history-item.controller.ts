@@ -54,7 +54,7 @@ export class HistoryItemController {
     description: 'Успех',
     example: HISTORY_ITEM_MOCK,
   })
-  createHistoryItem(@Body() historyItem: CreateHistoryItemDto): HistoryItems {
+  createHistoryItem(@Body() historyItem: CreateHistoryItemDto) {
     return this.historyItemService.addHistoryItem(historyItem);
   }
 

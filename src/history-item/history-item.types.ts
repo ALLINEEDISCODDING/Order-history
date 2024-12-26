@@ -3,8 +3,19 @@ import { ApiProperty } from '@nestjs/swagger';
 class OriginalResourceDto {
   @ApiProperty({
     description: 'Название ресурса',
+    enum: ['order', 'comments'],
   })
   name: string;
+
+  @ApiProperty({
+    description: 'Оставшийся путь, что бы получить оригинальный объект',
+  })
+  otherPathForGetCurrentObject: string;
+
+  @ApiProperty({
+    description: 'Метод запроса',
+  })
+  method: 'GET' | 'POST';
 
   @ApiProperty({
     description: 'Url ресурса',
@@ -16,7 +27,6 @@ export class CreateHistoryItemDto {
   constructor({ originalResource, after, before, comment }) {
     this.originalResource = originalResource;
     this.after = after;
-    this.before = before;
     this.comment = comment;
   }
   @ApiProperty({
@@ -28,11 +38,6 @@ export class CreateHistoryItemDto {
     description: 'Объект после изменения (формат JSON)',
   })
   after: string;
-
-  @ApiProperty({
-    description: 'Объект до изменения (формат JSON)',
-  })
-  before: string;
 
   @ApiProperty({
     description: 'Комментарий к истории',
@@ -58,4 +63,9 @@ export class HistoryItems extends CreateHistoryItemDto {
 
   @ApiProperty()
   updatedAt: string;
+
+  @ApiProperty({
+    description: 'Объект до изменения (формат JSON)',
+  })
+  before: string;
 }

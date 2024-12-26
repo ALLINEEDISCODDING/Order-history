@@ -1,8 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateHistoryItemDto, HistoryItems } from './history-item.types';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class HistoryItemService {
+  constructor(private readonly httpService: HttpService) {}
+
   private historyItems: HistoryItems[] = [];
 
   public getHistoryItems = (): HistoryItems[] => {
@@ -18,7 +21,10 @@ export class HistoryItemService {
     return finded;
   };
 
-  public editHistoryItem = (id: string, historyItem: CreateHistoryItemDto) => {
+  public editHistoryItem = async (
+    id: string,
+    historyItem: CreateHistoryItemDto,
+  ) => {
     let findHistoryItem = this.historyItems.find((item) => item.id === id);
 
     if (!findHistoryItem)
@@ -42,15 +48,26 @@ export class HistoryItemService {
     return historyItemModified as HistoryItems;
   };
 
-  public addHistoryItem = (historyItem: CreateHistoryItemDto) => {
-    const historyItemModified: HistoryItems = {
-      ...historyItem,
-      id: `history_item-${Date.now().toString()}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    this.historyItems.push(historyItemModified);
+  public addHistoryItem = async (historyItem: CreateHistoryItemDto) => {
+    let currentObject;
+    try {
+      currentObject = await this.httpService.axiosRef[
+        historyItem.originalResource.method.toLowerCase()
+      ](
+        `${historyItem.originalResource.url}${historyItem.originalResource.otherPathForGetCurrentObject}`,
+      );
+    } finally {
+      const historyItemModified: HistoryItems = {
+        ...historyItem,
+        comment: historyItem.comment || 'Объект был создан',
+        id: `history_item-${Date.now().toString()}`,
+        before: JSON.stringify(currentObject?.data || null),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      this.historyItems.push(historyItemModified);
 
-    return historyItemModified;
+      return historyItemModified;
+    }
   };
 }
