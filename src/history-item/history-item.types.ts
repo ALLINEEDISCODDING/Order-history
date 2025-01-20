@@ -1,38 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-class OriginalResourceDto {
-  @ApiProperty({
-    description: 'Название ресурса',
-    enum: ['order', 'comments'],
-  })
-  name: string;
-
-  @ApiProperty({
-    description: 'Оставшийся путь, что бы получить оригинальный объект',
-  })
-  otherPathForGetCurrentObject: string;
-
-  @ApiProperty({
-    description: 'Метод запроса',
-  })
-  method: 'GET' | 'POST';
-
-  @ApiProperty({
-    description: 'Url ресурса',
-  })
-  url: string;
-}
-
 export class CreateHistoryItemDto {
-  constructor({ originalResource, after, before, comment }) {
-    this.originalResource = originalResource;
+  constructor({ after, comment }) {
     this.after = after;
     this.comment = comment;
   }
+
   @ApiProperty({
-    description: 'Оригинальный ресурс с которого пришло изменение',
+    description: 'Id объекта по которому происходит связь полей after и before',
   })
-  originalResource: OriginalResourceDto;
+  objectId: string;
 
   @ApiProperty({
     description: 'Объект после изменения (формат JSON)',
@@ -47,8 +24,8 @@ export class CreateHistoryItemDto {
 }
 
 export class HistoryItems extends CreateHistoryItemDto {
-  constructor({ id, after, before, originalResource, comment }) {
-    super({ after, before, originalResource, comment });
+  constructor({ id, after, comment }) {
+    super({ after, comment });
 
     this.id = id;
     this.createdAt = new Date().toISOString();

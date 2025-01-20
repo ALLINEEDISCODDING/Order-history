@@ -1,6 +1,8 @@
+// @ts-nocheck
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateHistoryItemDto, HistoryItems } from './history-item.types';
 import { HttpService } from '@nestjs/axios';
+import { sort } from 'radash';
 
 @Injectable()
 export class HistoryItemService {
@@ -49,25 +51,20 @@ export class HistoryItemService {
   };
 
   public addHistoryItem = async (historyItem: CreateHistoryItemDto) => {
-    let currentObject;
-    try {
-      currentObject = await this.httpService.axiosRef[
-        historyItem.originalResource.method.toLowerCase()
-      ](
-        `${historyItem.originalResource.url}${historyItem.originalResource.otherPathForGetCurrentObject}`,
-      );
-    } finally {
-      const historyItemModified: HistoryItems = {
-        ...historyItem,
-        comment: historyItem.comment || 'Объект был создан',
-        id: `history_item-${Date.now().toString()}`,
-        before: JSON.stringify(currentObject?.data || null),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      this.historyItems.push(historyItemModified);
+    let currentObject = this.historyItems.find(
+      (item) => item.objectId === historyItem.objectId,
+    );
 
-      return historyItemModified;
-    }
+    const historyItemModified: HistoryItems = {
+      ...historyItem,
+      comment: historyItem.comment || 'Объект был создан',
+      id: `history_item-${Date.now().toString()}`,
+      before: currentObject ? currentObject.after : null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    this.historyItems.push(historyItemModified);
+
+    return historyItemModified;
   };
 }

@@ -13,17 +13,10 @@ import { HistoryItemService } from './history-item.service';
 import { CreateHistoryItemDto, HistoryItems } from './history-item.types';
 import { ApiResponse } from '@nestjs/swagger';
 
-const ORIGIONAL_RESOURCE_MOCK = {
-  name: 'someName',
-  url: 'http://some-site.ru',
-};
 const AFTER_MOCK = "['after array item']";
-const BEFORE_MOCK = "['before array item']";
 const HISTORY_ITEM_MOCK = new HistoryItems({
   id: 'some-item-id',
-  originalResource: ORIGIONAL_RESOURCE_MOCK,
   after: AFTER_MOCK,
-  before: BEFORE_MOCK,
   comment: 'Какой-нибудь комментарий',
 });
 @Controller('history-item')
