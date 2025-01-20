@@ -1,8 +1,6 @@
-// @ts-nocheck
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateHistoryItemDto, HistoryItems } from './history-item.types';
 import { HttpService } from '@nestjs/axios';
-import { sort } from 'radash';
 
 @Injectable()
 export class HistoryItemService {
