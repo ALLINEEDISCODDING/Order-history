@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateHistoryItemDto, HistoryItems } from './history-item.types';
-import { HttpService } from '@nestjs/axios';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { CronJob } from 'cron';
 
 @Injectable()
 export class HistoryItemService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(private readonly schedulerRegistry: SchedulerRegistry) {}
 
   private historyItems: HistoryItems[] = [];
 
@@ -53,15 +54,37 @@ export class HistoryItemService {
       (item) => item.objectId === historyItem.objectId,
     );
 
+    const id = `history_item-${Date.now().toString()}`;
+
     const historyItemModified: HistoryItems = {
       ...historyItem,
       comment: historyItem.comment || 'Объект был создан',
-      id: `history_item-${Date.now().toString()}`,
+      id,
       before: currentObject ? currentObject.after : null,
+      isArchived: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
+
     this.historyItems.push(historyItemModified);
+
+    const { cron } = historyItem;
+
+    const job = new CronJob(cron, () => {
+      this.historyItems = this.historyItems.map((item) => {
+        if (item.id === id) {
+          return {
+            ...item,
+            isArchived: true,
+          };
+        }
+
+        return item;
+      });
+      console.log(`Элемент ${id} был архивирован`);
+    });
+    this.schedulerRegistry.addCronJob(`item-delete-${id}`, job);
+    job.start();
 
     return historyItemModified;
   };

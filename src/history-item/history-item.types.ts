@@ -21,6 +21,11 @@ export class CreateHistoryItemDto {
     required: false,
   })
   comment: string;
+
+  @ApiProperty({
+    description: 'cron-строка для авто-архивирования',
+  })
+  cron: string;
 }
 
 export class HistoryItems extends CreateHistoryItemDto {
@@ -45,4 +50,9 @@ export class HistoryItems extends CreateHistoryItemDto {
     description: 'Объект до изменения (формат JSON)',
   })
   before: string;
+
+  @ApiProperty({
+    description: 'Архивирована запись или нет',
+  })
+  isArchived: boolean;
 }
